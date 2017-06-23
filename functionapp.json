@@ -6,11 +6,9 @@
         "functionAppName": {
             "type": "string"
         },
-        "appSettings":{
-            "type":"object"
-        },
-        "serverfarms": {
-            "type": "string"
+        "appSettings": {
+            "type": "array",
+            "defaultValue": []
         }
     },
     "variables": {
@@ -57,8 +55,8 @@
                 "name": "[parameters('functionAppName')]",
                 "siteConfig": {
                     "appSettings": {
-                        "name": ["parameters('appSettings')[copyIndex()].name"],
-                        "value": ["parameters('appSettings')[copyIndex()].value"]
+                        "name": "[parameters('appSettings')[copyIndex()].name]",
+                        "value": "[parameters('appSettings')[copyIndex()].value]"
                     }
                 },
                 "hostNames": [
@@ -82,11 +80,29 @@
                         "ipBasedSslState": 0
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms'))]"
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('functionAppName'))]"
             },
             "dependsOn": [
-                "Microsoft.Resources/deployments/storageTemplate",
-                "Microsoft.Resources/deployments/serverfarmsTemplate"
+                "[resourceId('Microsoft.Resources/deployments', 'storageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'serverfarmsTemplate')]"
+            ],
+            "resources": [
+                {
+                    "apiVersion": "2015-08-01",
+                    "name": "appsettings",
+                    "type": "config",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites/', parameters('functionAppName'))]"
+                    ],
+                    "properties": {
+                        "AzureWebJobsDashboard": "[reference('storageTemplate').outputs.connectionString.value]",
+                        "AzureWebJobsStorage": "[reference('storageTemplate').outputs.connectionString.value]",
+                        "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[reference('storageTemplate').outputs.connectionString.value]",
+                        "WEBSITE_CONTENTSHARE": "[toLower(parameters('functionAppName'))]",
+                        "FUNCTIONS_EXTENSION_VERSION": "~1",
+                        "WEBSITE_NODE_DEFAULT_VERSION": "6.5.0"
+                    }
+                }
             ]
         }
     ]

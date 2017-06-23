@@ -28,5 +28,11 @@
                 "accountType": "[parameters('Standard_LRS')]"
             }
         }
-    ]
+    ],
+    "outputs": {
+        "connectionString": {
+            "type": "string",
+            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')),'2015-05-01-preview').key1)]"
+        }
+    }
 }
