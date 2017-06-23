@@ -18,6 +18,9 @@
             "defaultValue": "Standard_LRS"
         }
     },
+    "variables": {
+        "resourceLocation": "[resourceGroup().location]"
+    },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",

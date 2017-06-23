@@ -22,8 +22,12 @@
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "parameters": {
-                    "storageAccountName": "[variables('storageAccountName')]",
-                    "storageAccountType": "Standard_LRS"
+                    "storageAccountName": {
+                        "value": "[variables('storageAccountName')]"
+                    },
+                    "storageAccountType": {
+                        "value": "Standard_LRS"
+                    }
                 },
                 "mode": "Incremental",
                 "templateLink": {
@@ -37,7 +41,9 @@
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "parameters": {
-                    "siteName": "[parameters('functionAppName')]"
+                    "siteName": {
+                        "value": "[parameters('functionAppName')]"
+                    }
                 },
                 "mode": "Incremental",
                 "templateLink": {
