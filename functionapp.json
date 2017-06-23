@@ -1,0 +1,93 @@
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "functionAppName": {
+            "type": "string"
+        },
+        "appSettings":{
+            "type":"object"
+        },
+        "serverfarms": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "resourceLocation": "[resourceGroup().location]",
+        "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-05-10",
+            "name": "storageTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "parameters": {
+                    "storageAccountName": "[variables('storageAccountName')]",
+                    "storageAccountType": "Standard_LRS"
+                },
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Sneezry/Azure-ARM-Template/master/storage.json#"
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "serverfarmsTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "parameters": {
+                    "siteName": "[parameters('functionAppName')]"
+                },
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Sneezry/Azure-ARM-Template/master/serverfarms.json#"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "kind": "functionapp",
+            "name": "[parameters('functionAppName')]",
+            "apiVersion": "2015-08-01",
+            "location": "[variables('resourceLocation')]",
+            "properties": {
+                "name": "[parameters('functionAppName')]",
+                "siteConfig": {
+                    "appSettings": {
+                        "name": ["parameters('appSettings')[copyIndex()].name"],
+                        "value": ["parameters('appSettings')[copyIndex()].value"]
+                    }
+                },
+                "hostNames": [
+                    "[concat(parameters('functionAppName'),'.azurewebsites.net')]"
+                ],
+                "enabledHostNames": [
+                    "[concat(parameters('functionAppName'),'.azurewebsites.net')]",
+                    "[concat(parameters('functionAppName'),'.scm.azurewebsites.net')]"
+                ],
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('functionAppName'),'.azurewebsites.net')]",
+                        "sslState": 0,
+                        "thumbprint": null,
+                        "ipBasedSslState": 0
+                    },
+                    {
+                        "name": "[concat(parameters('functionAppName'),'.scm.azurewebsites.net')]",
+                        "sslState": 0,
+                        "thumbprint": null,
+                        "ipBasedSslState": 0
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms'))]"
+            },
+            "dependsOn": [
+                "Microsoft.Resources/deployments/storageTemplate",
+                "Microsoft.Resources/deployments/serverfarmsTemplate"
+            ]
+        }
+    ]
+}

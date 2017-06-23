@@ -46,5 +46,19 @@
                 "features": "None"
             }
         }
-    ]
+    ],
+    "outputs": {
+        "iotHubConnectionString": {
+            "type" : "string",
+            "value": "[concat('HostName=', parameters('iotHubName'), '.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs/Iothubkeys', parameters('iotHubName'), 'iothubowner'), '2016-02-03').primaryKey)]"
+        },
+        "eventHubConnectionString": {
+            "type" : "string",
+            "value": "[concat('Endpoint=', reference(resourceId('Microsoft.Devices/IoTHubs', parameters('iotHubName'))).eventHubEndpoints.events.endpoint,';SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs/Iothubkeys', parameters('iotHubName'), 'iothubowner'), '2016-02-03').primaryKey)]"
+        },
+        "eventHubConnectionPath": {
+            "type" : "string",
+            "value": "[reference(resourceId('Microsoft.Devices/IoTHubs', parameters('iotHubName'))).eventHubEndpoints.events.path]"
+        }
+    }
 }
