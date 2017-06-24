@@ -12,7 +12,18 @@
     },
     "variables": {
         "resourceLocation": "[resourceGroup().location]",
-        "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]"
+        "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]",
+        "defaultAppSettings": [
+            {
+                "name": "WEBSITE_CONTENTSHARE",
+                "value": "[toLower(parameters('functionAppName'))]"
+            },
+            {
+                "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                "value": "6.5.0"
+            }
+        ],
+        "appSettings": "[union(variables('defaultAppSettings'), parameters('appSettings'))]"
     },
     "resources": [
         {
@@ -51,6 +62,41 @@
             }
         },
         {
+            "apiVersion": "2017-05-10",
+            "name": "storageConnectionStringAppSettings",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [],
+                    "outputs": {
+                        "connctionStrings": {
+                            "type": "array",
+                            "value": [
+                                {
+                                    "name": "AzureWebJobsDashboard",
+                                    "value": "[reference('storageTemplate').outputs.connectionString.value]"
+                                },
+                                {
+                                    "name": "AzureWebJobsStorage",
+                                    "value": "[reference('storageTemplate').outputs.connectionString.value]"
+                                },
+                                {
+                                    "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                                    "value": "[reference('storageTemplate').outputs.connectionString.value]"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'storageTemplate')]"
+            ]
+        },
+        {
             "type": "Microsoft.Web/sites",
             "kind": "functionapp",
             "name": "[parameters('functionAppName')]",
@@ -59,10 +105,7 @@
             "properties": {
                 "name": "[parameters('functionAppName')]",
                 "siteConfig": {
-                    "appSettings": {
-                        "name": "[parameters('appSettings')[copyIndex()].name]",
-                        "value": "[parameters('appSettings')[copyIndex()].value]"
-                    }
+                    "appSettings": "[union(reference('storageConnectionStringAppSettings').outputs.connctionStrings.value, variables('appSettings'))]"
                 },
                 "hostNames": [
                     "[concat(parameters('functionAppName'),'.azurewebsites.net')]"
@@ -88,26 +131,8 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('functionAppName'))]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'storageTemplate')]",
+                "[resourceId('Microsoft.Resources/deployments', 'storageConnectionStringAppSettings')]",
                 "[resourceId('Microsoft.Resources/deployments', 'serverfarmsTemplate')]"
-            ],
-            "resources": [
-                {
-                    "apiVersion": "2015-08-01",
-                    "name": "appsettings",
-                    "type": "config",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites/', parameters('functionAppName'))]"
-                    ],
-                    "properties": {
-                        "AzureWebJobsDashboard": "[reference('storageTemplate').outputs.connectionString.value]",
-                        "AzureWebJobsStorage": "[reference('storageTemplate').outputs.connectionString.value]",
-                        "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[reference('storageTemplate').outputs.connectionString.value]",
-                        "WEBSITE_CONTENTSHARE": "[toLower(parameters('functionAppName'))]",
-                        "FUNCTIONS_EXTENSION_VERSION": "~1",
-                        "WEBSITE_NODE_DEFAULT_VERSION": "6.5.0"
-                    }
-                }
             ]
         }
     ]
