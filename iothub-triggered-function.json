@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "functionAppName": {
+            "type": "string"
+        },
+        "iothubName": {
+            "type": "string"
+        },
+        "iothubExisted": {
+            "type": "string",
+            "defaultValue": ""
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-05-10",
+            "name": "iothubTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "parameters": {
+                    "iothubName": {
+                        "value": "[parameters('iothubName')]"
+                    }
+                },
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat('https://raw.githubusercontent.com/Sneezry/Azure-ARM-Template/master/', parameters('iothubExisted'), 'iothub.json#')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "functionAppTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "parameters": {
+                    "siteName": {
+                        "value": "[parameters('functionAppName')]"
+                    },
+                    "appSettings": {
+                        "value": [
+                            {
+                                "name": "iotHubConnectionString",
+                                "value": "[reference('iothubTemplate').outputs.iotHubConnectionString.value]"
+                            },
+                            {
+                                "name": "eventHubConnectionString",
+                                "value": "[reference('iothubTemplate').outputs.eventHubConnectionString.value]"
+                            },
+                            {
+                                "name": "eventHubConnectionPath",
+                                "value": "[reference('iothubTemplate').outputs.eventHubConnectionPath.value]"
+                            }
+                        ]
+                    }
+                },
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Sneezry/Azure-ARM-Template/master/function.json#"
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'iothubTemplate')]"
+            ]
+        }
+    ]
+}
