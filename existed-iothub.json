@@ -4,6 +4,20 @@
     "parameters": {
         "iothubName": {
             "type": "string"
+        },
+        "iotHubSku": {
+            "type": "string",
+            "allowedValues": [
+                "F1",
+                "S1",
+                "S2"
+            ],
+            "defaultValue": "F1"
+        },
+        "iotHubCapacity": {
+            "type": "int",
+            "minValue": 1,
+            "defaultValue": 1
         }
     },
     "resources": [],

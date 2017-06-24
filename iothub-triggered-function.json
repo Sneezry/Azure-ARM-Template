@@ -8,6 +8,20 @@
         "iothubName": {
             "type": "string"
         },
+        "iotHubSku": {
+            "type": "string",
+            "allowedValues": [
+                "F1",
+                "S1",
+                "S2"
+            ],
+            "defaultValue": "F1"
+        },
+        "iotHubCapacity": {
+            "type": "int",
+            "minValue": 1,
+            "defaultValue": 1
+        },
         "iothubExisted": {
             "type": "string",
             "defaultValue": ""
@@ -22,6 +36,12 @@
                 "parameters": {
                     "iothubName": {
                         "value": "[parameters('iothubName')]"
+                    },
+                    "iotHubSku": {
+                        "value": "[parameters('iotHubSku')]"
+                    },
+                    "iotHubCapacity": {
+                        "value": "[parameters('iotHubCapacity')]"
                     }
                 },
                 "mode": "Incremental",
@@ -58,7 +78,7 @@
                 },
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/Sneezry/Azure-ARM-Template/master/function.json#"
+                    "uri": "https://raw.githubusercontent.com/Sneezry/Azure-ARM-Template/master/functionapp.json#"
                 }
             },
             "dependsOn": [
