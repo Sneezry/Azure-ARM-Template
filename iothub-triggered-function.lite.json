@@ -1,6 +1,4 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
     "parameters": {
         "functionAppName": {
             "type": "string"
@@ -10,32 +8,17 @@
         },
         "iotHubSku": {
             "type": "string",
-            "allowedValues": [
-                "F1",
-                "S1",
-                "S2"
-            ],
             "defaultValue": "F1"
         },
         "iotHubCapacity": {
             "type": "int",
-            "minValue": 1,
             "defaultValue": 1
-        },
-        "iothubExisted": {
-            "type": "string",
-            "allowedValues": [
-                "",
-                "existed-"
-            ],
-            "defaultValue": ""
         }
     },
     "resources": [
         {
-            "apiVersion": "2017-05-10",
             "name": "iothubTemplate",
-            "type": "Microsoft.Resources/deployments",
+            "type": "iothub",
             "properties": {
                 "parameters": {
                     "iothubName": {
@@ -47,17 +30,12 @@
                     "iotHubCapacity": {
                         "value": "[parameters('iotHubCapacity')]"
                     }
-                },
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat('https://raw.githubusercontent.com/Sneezry/Azure-ARM-Template/master/', parameters('iothubExisted'), 'iothub.json#')]"
                 }
             }
         },
         {
-            "apiVersion": "2017-05-10",
             "name": "functionAppTemplate",
-            "type": "Microsoft.Resources/deployments",
+            "type": "functionapp",
             "properties": {
                 "parameters": {
                     "functionAppName": {
@@ -79,14 +57,10 @@
                             }
                         ]
                     }
-                },
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/Sneezry/Azure-ARM-Template/master/functionapp.json#"
                 }
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'iothubTemplate')]"
+                "iothubTemplate"
             ]
         }
     ]
