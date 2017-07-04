@@ -27,6 +27,25 @@
     "resources": [
         {
             "apiVersion": "2017-05-10",
+            "name": "storageTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "parameters": {
+                    "storageAccountName": {
+                        "value": "[variables('storageAccountName')]"
+                    },
+                    "storageAccountType": {
+                        "value": "Standard_LRS"
+                    }
+                },
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/Sneezry/Azure-ARM-Template/master/storage.json#"
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
             "name": "storageConnectionStringAppSettings",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -41,21 +60,24 @@
                             "value": [
                                 {
                                     "name": "AzureWebJobsDashboard",
-                                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]"
+                                    "value": "[reference('storageTemplate').outputs.connectionString.value]"
                                 },
                                 {
                                     "name": "AzureWebJobsStorage",
-                                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]"
+                                    "value": "[reference('storageTemplate').outputs.connectionString.value]"
                                 },
                                 {
                                     "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2015-05-01-preview').key1)]"
+                                    "value": "[reference('storageTemplate').outputs.connectionString.value]"
                                 }
                             ]
                         }
                     }
                 }
-            }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'storageTemplate')]"
+            ]
         },
         {
             "type": "Microsoft.Web/sites",
@@ -68,7 +90,10 @@
                 "siteConfig": {
                     "appSettings": "[variables('appSettings')]"
                 }
-            }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'storageConnectionStringAppSettings')]"
+            ]
         }
     ]
 }
