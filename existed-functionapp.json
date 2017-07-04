@@ -62,6 +62,7 @@
             "kind": "functionapp",
             "name": "[parameters('functionAppName')]",
             "apiVersion": "2015-08-01",
+            "location": "West US",
             "properties": {
                 "name": "[parameters('functionAppName')]",
                 "siteConfig": {
