@@ -6,9 +6,6 @@
             "type": "string"
         }
     },
-    "variables": {
-        "resourceLocation": "[resourceGroup().location]"
-    },
     "resources": [
         {
             "type": "Microsoft.Web/serverfarms",
@@ -22,7 +19,7 @@
             "kind": "functionapp",
             "name": "[parameters('siteName')]",
             "apiVersion": "2015-08-01",
-            "location": "[variables('resourceLocation')]",
+            "location": "West US",
             "properties": {
                 "name": "[parameters('siteName')]",
                 "numberOfWorkers": 0

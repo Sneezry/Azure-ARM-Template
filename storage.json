@@ -17,15 +17,12 @@
             "defaultValue": "Standard_LRS"
         }
     },
-    "variables": {
-        "resourceLocation": "[resourceGroup().location]"
-    },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[parameters('storageAccountName')]",
             "apiVersion": "2015-06-15",
-            "location": "[variables('resourceLocation')]",
+            "location": "West US",
             "properties": {
                 "accountType": "[parameters('storageAccountType')]"
             }

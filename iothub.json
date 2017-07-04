@@ -20,9 +20,6 @@
             "defaultValue": 1
         }
     },
-    "variables": {
-        "resourceLocation": "[resourceGroup().location]"
-    },
     "resources": [
         {
             "type": "Microsoft.Devices/IotHubs",
@@ -32,7 +29,7 @@
             },
             "name": "[parameters('iotHubName')]",
             "apiVersion": "2016-02-03",
-            "location": "[variables('resourceLocation')]",
+            "location": "West US",
             "tags": {},
             "properties": {
                 "eventHubEndpoints": {

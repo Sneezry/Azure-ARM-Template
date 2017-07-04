@@ -11,7 +11,6 @@
         }
     },
     "variables": {
-        "resourceLocation": "[resourceGroup().location]",
         "storageAccountName": "[concat('storage', uniquestring(resourceGroup().id))]",
         "defaultAppSettings": [
             {
@@ -21,6 +20,10 @@
             {
                 "name": "WEBSITE_NODE_DEFAULT_VERSION",
                 "value": "6.5.0"
+            },
+            {
+                "name": "FUNCTIONS_EXTENSION_VERSION",
+                "value": "~1"
             }
         ],
         "appSettings": "[union(variables('defaultAppSettings'), parameters('appSettings'))]"
@@ -101,7 +104,7 @@
             "kind": "functionapp",
             "name": "[parameters('functionAppName')]",
             "apiVersion": "2015-08-01",
-            "location": "[variables('resourceLocation')]",
+            "location": "West US",
             "properties": {
                 "name": "[parameters('functionAppName')]",
                 "siteConfig": {
