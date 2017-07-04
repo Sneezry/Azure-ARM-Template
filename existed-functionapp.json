@@ -55,10 +55,7 @@
                         }
                     }
                 }
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'storageTemplate')]"
-            ]
+            }
         },
         {
             "type": "Microsoft.Web/sites",
