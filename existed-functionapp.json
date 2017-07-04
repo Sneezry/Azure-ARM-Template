@@ -5,6 +5,9 @@
         "functionAppName": {
             "type": "string"
         },
+        "functionAppLocation": {
+            "type": "string"
+        },
         "appSettings": {
             "type": "array",
             "defaultValue": []
@@ -62,6 +65,7 @@
             "kind": "functionapp",
             "name": "[parameters('functionAppName')]",
             "apiVersion": "2015-08-01",
+            "location": "[parameters('functionAppLocation')]",
             "properties": {
                 "name": "[parameters('functionAppName')]",
                 "siteConfig": {
