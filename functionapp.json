@@ -5,10 +5,6 @@
         "functionAppName": {
             "type": "string"
         },
-        "functionAppLocation": {
-            "type": "string",
-            "defaultValue": ""
-        },
         "appSettings": {
             "type": "array",
             "defaultValue": []
